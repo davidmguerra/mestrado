@@ -1,0 +1,35 @@
+body {
+    overflow: hidden;
+}
+.main {
+    width: calc(100vh - 60px);
+    height: calc(100vh - 60px);
+    background-color: #EEE;
+}
+.agents {
+    height: calc(100vh - (100vh / 50) - 60px);
+    position: relative;
+    width: calc(100vh - (100vh / 50) - 60px);
+}
+
+.agent {
+    width:calc(100vh / 50);
+    height:calc(100vh / 50);
+    border-radius: 50%;
+    position:absolute;
+}
+
+.raio {
+    position: absolute;
+    border: 2px dashed #000;
+    border-radius: 50%;
+    background-color: yellow;
+}
+
+.border {
+    border: 1px solid #000 !important;
+    width:calc(100vh / 40) !important;
+    height:calc(100vh / 40) !important;
+    -webkit-transition: width 1s; /* Safari */
+    transition: width 1s;
+}
