@@ -1,5 +1,4 @@
 var chart = Highcharts.chart('container', {
-
     title: {
         text: 'Parâmetros de ordem'
     },
@@ -26,7 +25,7 @@ var chart = Highcharts.chart('container', {
             pointStart: 1
         }
     },
-    series: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9].map(value => { return { name: value, data: []}; })
+    series: [0.1,0.3,0.5,0.7,0.9].map(value => { return { name: value, data: []}; })
 });
 let series;
 
@@ -49,9 +48,9 @@ function init() {
             .forEach(el => document.querySelector(el).innerHTML = '');
 
     chart.update({
-        series: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9].map(value => { return { data: []}; })
+        series: [0.1,0.3,0.5,0.7,0.9].map(() => { return { data: []}; })
     });
-    series = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9].map(value => { return { name: value, data: []}; });
+    series = [0.1,0.3,0.5,0.7,0.9].map(value => { return { name: value, data: []}; });
 
     paused = false;
     document.querySelector('#btnPause').innerHTML = 'Pause';
@@ -142,7 +141,7 @@ function init() {
     }
 
     function calcShcelling() {
-        [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+        [0.1,0.3,0.5,0.7,0.9]
             .forEach((threshold, nbIndex) => {
             var paramOrderAgente = [];
             agents.forEach((agent, index) => {

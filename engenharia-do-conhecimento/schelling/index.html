@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="../libs/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../../libs/bootstrap/bootstrap.min.css">
 
     <link rel="stylesheet" href="style.css">
 
@@ -37,11 +37,11 @@
           </div>
           <div class="mb-3">
             <label>Intervalo de verificação (ms)</label>
-            <input type="number" class="form-control" id="intervaloVerificacao" placeholder="Intervalo de verificação (ms)" value="10" required>
+            <input type="number" class="form-control" id="intervaloVerificacao" placeholder="Intervalo de verificação (ms)" value="1" required>
           </div>
           <div class="mb-3">
             <label>Iterações (0 para contínuo)</label>
-            <input type="number" class="form-control" id="iteracoes" placeholder="Iterações" value="8" required>
+            <input type="number" class="form-control" id="iteracoes" placeholder="Iterações" value="1000" required>
           </div>
           <hr class="mb-4">
           <button id="btn" class="btn btn-primary btn-lg btn-block" type="submit">Executar</button>
@@ -60,12 +60,18 @@
         </nav>
         <div class="tab-content" id="nav-tabContent">
           <div class="tab-pane fade show active" id="nav-teste" role="tabpanel" aria-labelledby="nav-teste-tab">
-            <div class="main">
-              <div class="agents">
+            <div class="row">
+              <div class="col-9">
+                <div class="main">
+                  <div class="agents">
+                  </div>
+                </div>
               </div>
-            </div>
-            <div style="overflow: auto;height: calc(100vh - 50px);position: absolute;right: 0;top: 50px;width: 150px;background-color: white;padding: 0 6px 6px 6px;">
-              <p id="log"></p>
+              <div class="col-3">
+                <div style="overflow: auto;height: calc(100vh - 50px);position: absolute;right: 0;top: 50px;width: 150px;background-color: white;padding: 0 6px 6px 6px;">
+                  <p id="log"></p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="tab-pane fade" id="nav-param-order" role="tabpanel" aria-labelledby="nav-param-order-tab">
@@ -76,17 +82,18 @@
     </div>
 
     <!-- HighCharts -->
-    <script src="../libs/highcharts/highcharts.js"></script>
-    <script src="../libs/highcharts/series-label.js"></script>
-    <script src="../libs/highcharts/exporting.js"></script>
-    <script src="../libs/highcharts/export-data.js"></script>
+    <script src="../../libs/highcharts/highcharts.js"></script>
+    <script src="../../libs/highcharts/series-label.js"></script>
+    <script src="../../libs/highcharts/exporting.js"></script>
+    <script src="../../libs/highcharts/export-data.js"></script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="../libs/jquery/jquery-3.3.1.slim.min.js"></script>
-    <script src="../libs/bootstrap/popper.min.js"></script>
-    <script src="../libs/bootstrap/bootstrap.min.js"></script>
+    <script src="../../libs/jquery/jquery-3.3.1.slim.min.js"></script>
+    <script src="../../libs/bootstrap/popper.min.js"></script>
+    <script src="../../libs/bootstrap/bootstrap.min.js"></script>
 
+    <script src="../../libs/utils.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
