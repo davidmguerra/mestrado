@@ -61,21 +61,29 @@
         <div class="tab-content" id="nav-tabContent">
           <div class="tab-pane fade show active" id="nav-teste" role="tabpanel" aria-labelledby="nav-teste-tab">
             <div class="row">
-              <div class="col-9">
+              <div class="col-2">
+                <div style="overflow: auto;height: calc(100vh - 50px);">
+                  <p id="log"></p>
+                </div>
+              </div>
+              <div class="col-10 p-3">
                 <div class="main">
                   <div class="agents">
                   </div>
                 </div>
               </div>
-              <div class="col-3">
-                <div style="overflow: auto;height: calc(100vh - 50px);position: absolute;right: 0;top: 50px;width: 150px;background-color: white;padding: 0 6px 6px 6px;">
-                  <p id="log"></p>
-                </div>
-              </div>
             </div>
           </div>
           <div class="tab-pane fade" id="nav-param-order" role="tabpanel" aria-labelledby="nav-param-order-tab">
-            <div id="container"></div>
+            <div class="row p-3" style="overflow: auto;height: calc(100vh - 45px);">
+              <div class="col-12">
+                  <div id="param-order"></div>
+              </div>
+              <div class="col-12">
+                  <div id="param-order-history"></div>
+              </div>
+            </div>
+            
           </div>
         </div>
       </div>

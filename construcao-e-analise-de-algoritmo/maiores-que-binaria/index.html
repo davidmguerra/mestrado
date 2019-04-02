@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../../libs/bootstrap/bootstrap.min.css">
+
+  </head>
+  <body>
+
+  <div class="container">
+  
+    <div class="row">
+      <div class="col-md-3 order-md-1 mb-4" style="overflow: auto;height: 100vh;">
+        <h4 class="mb-3">Parâmetros</h4>
+        <form onsubmit="return processar()">
+          <div class="mb-3">
+            <label>Lista (vetor)</label>
+            <input type="text" class="form-control" id="A" placeholder="A" value="1, 2, 3, 4, 7, 9, 14, 21" required>
+          </div>
+          <div class="mb-3">
+            <label>Valor (valor)</label>
+            <input type="number" class="form-control" id="v" placeholder="v" value="9" min="0" required>
+          </div>
+          <div class="mb-3">
+              <label>Início (inicio)</label>
+              <input type="number" class="form-control" id="p" placeholder="p" value="1" min="0" required>
+            </div>
+          <div class="mb-3">
+              <label>Fim (fim)</label>
+              <input type="number" class="form-control" id="r" placeholder="r" value="8" min="0" required>
+            </div>
+          <hr class="mb-4">
+          <button id="btn" class="btn btn-primary btn-lg btn-block" type="submit">Executar</button>
+        </form>
+        <div class="mt-3">
+          <b>Resultado</b>: <span id="resultado"></span>
+        </div>
+      </div>
+      <div class="col-md-9 order-md-2">
+        <div class="row">
+          <div class="col-12">
+            <textarea id="code" style="width:100%;height: 95vh" class="p-3">
+              function maioresQueBinaria(vetor, valor, inicio, fim) {
+                if (inicio > fim)
+                  return 0;
+                meio = Math.floor((inicio + fim)/2);
+                if (vetor[meio] <= valor)
+                  return maioresQueBinaria(vetor, valor, meio + 1, fim);
+                else
+                  return (fim - meio + 1) + maioresQueBinaria(vetor, valor, inicio, meio - 1);
+              }
+            </textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HighCharts -->
+    <script src="../../libs/highcharts/highcharts.js"></script>
+    <script src="../../libs/highcharts/series-label.js"></script>
+    <script src="../../libs/highcharts/exporting.js"></script>
+    <script src="../../libs/highcharts/export-data.js"></script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../../libs/jquery/jquery-3.3.1.slim.min.js"></script>
+    <script src="../../libs/bootstrap/popper.min.js"></script>
+    <script src="../../libs/bootstrap/bootstrap.min.js"></script>
+
+    <script src="../../libs/utils.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>

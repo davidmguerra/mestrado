@@ -1,56 +1,23 @@
-var chart = Highcharts.chart('container', {
-    title: {
-        text: 'Parâmetros de ordem'
-    },
-    subtitle: {
-        text: 'por threshold'
-    },
-
-    yAxis: {
-        title: {
-            text: 'Nível de Segregação'
-        }
-    },
-    legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'middle'
-    },
-
-    plotOptions: {
-        series: {
-            label: {
-                connectorAllowed: false
-            },
-            pointStart: 1
-        }
-    },
-    series: [0.1,0.3,0.5,0.7,0.9].map(value => { return { name: value, data: []}; })
-});
+let seriesHistory;
 let series;
-
-var intervalTimeout;
 var paused;
+var lastState;
 function init() {
 
-    if (intervalTimeout) {
+    if (document.querySelector('#btn').innerHTML == 'Parar') {
         document.querySelector('#btn').innerHTML = 'Executar';
         document.querySelector('#btnPause').classList.add('d-none');
-        clearInterval(intervalTimeout);
-        intervalTimeout = undefined;
-        ['numeroAgentes','raioVizinhanca','limiteMover','intervaloVerificacao','tiposAgentes']
-            .forEach(el => document.getElementById(el).disabled = false);
-        showParamOrder();
         return;
     }
+
+    document.querySelector("#param-order").innerHTML = '';
+    document.querySelector("#param-order-history").innerHTML = '';
 
     ['#log','.main .agents']
             .forEach(el => document.querySelector(el).innerHTML = '');
 
-    chart.update({
-        series: [0.1,0.3,0.5,0.7,0.9].map(() => { return { data: []}; })
-    });
-    series = [0.1,0.3,0.5,0.7,0.9].map(value => { return { name: value, data: []}; });
+    seriesHistory = [0.1,0.3,0.5,0.7,0.9].map(value => { return { name: value, data: []}; });
+    series = [ { data: [] }];
 
     paused = false;
     document.querySelector('#btnPause').innerHTML = 'Pause';
@@ -102,7 +69,13 @@ function init() {
 
     var iterator = 0;
     function update(agent) {
-        if (!paused) {
+        if (document.querySelector('#btn').innerHTML == 'Executar') {
+            ['numeroAgentes','raioVizinhanca','limiteMover','intervaloVerificacao','tiposAgentes']
+                .forEach(el => document.getElementById(el).disabled = false);
+            calcShcelling();
+            showParamOrder();
+            return;
+        } else if (!paused) {
             if (iterator >= iterators && iterators != 0) {
                 return init();
             }
@@ -134,13 +107,43 @@ function init() {
             log += iterator + ' iterações<br/>'
             neighbors.forEach(agent => log += '<font color=' + agentColor[agent.type] + '>o</font> ' + agent.id + '<br/>');
             document.querySelector('#log').innerHTML = log;
+            calcShcellingHistory();
+        } else if (lastState != paused) {
             calcShcelling();
+            showParamOrder();
         }
-        intervalTimeout = setTimeout(() => update(agent), interval);
+        lastState = paused;
+        setTimeout(() => update(agent), interval);
         
     }
 
-    function calcShcelling() {
+    function showParamOrder() {
+        var paramOrderHistory = Highcharts.chart('param-order-history', {
+            title: { text: 'Histórico de parâmetros de ordem' },
+            subtitle: { text: 'por threshold' },
+            yAxis: { title: { text: 'Nível de Segregação' } },
+            legend: { layout: 'vertical', align: 'right', verticalAlign: 'middle' },
+            plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 1 } },
+            series: [0.1,0.3,0.5,0.7,0.9].map(value => { return { name: value, data: []}; })
+        });
+        var paramOrder = Highcharts.chart('param-order', {
+            title: { text: 'Parâmetros de ordem' },
+            subtitle: { text: 'por threshold' },
+            yAxis: { title: { text: 'Nível de Segregação' } },
+            xAxis: { categories: ['0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9'] },
+            legend: { layout: 'vertical', align: 'right', verticalAlign: 'middle' },
+            plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 1 } },
+            series: [ { name: 'Threshold', data: []} ]
+        });
+        paramOrderHistory.update({
+            series: seriesHistory
+        });
+        paramOrder.update({
+            series: series
+        });
+    }
+
+    function calcShcellingHistory() {
         [0.1,0.3,0.5,0.7,0.9]
             .forEach((threshold, nbIndex) => {
             var paramOrderAgente = [];
@@ -155,7 +158,27 @@ function init() {
                 }
             });
             var total = paramOrderAgente.reduce((total, num) => total + num);
-            series[nbIndex].data.push(total / numberAgents);
+            seriesHistory[nbIndex].data.push(total / numberAgents);
+        });
+    }
+
+    function calcShcelling() {
+        series[0].data = [];
+        [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+            .forEach((threshold, nbIndex) => {
+            var paramOrderAgente = [];
+            agents.forEach((agent, index) => {
+                var neighbors = calcNeighbors(agent);
+                neighbors.push(agent);
+                if (neighbors.length) {
+                    var q = neighbors.filter(nb => nb.type == agent.type).length / neighbors.length
+                    paramOrderAgente[index] = q < threshold?0:1;
+                } else {
+                    paramOrderAgente[index] = 1;
+                }
+            });
+            var total = paramOrderAgente.reduce((total, num) => total + num);
+            series[0].data.push(total / numberAgents);
         });
     }
 
@@ -173,14 +196,9 @@ function pause() {
     paused = !paused;
     if (paused) {
         document.querySelector('#btnPause').innerHTML = 'Continue';
-        showParamOrder();
     } else {
+        document.querySelector("#param-order").innerHTML = '';
+        document.querySelector("#param-order-history").innerHTML = '';
         document.querySelector('#btnPause').innerHTML = 'Pause';
     }
-}
-
-function showParamOrder() {
-    chart.update({
-        series: series
-    });
 }
