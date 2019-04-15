@@ -12,19 +12,24 @@
     <form onsubmit="init();return false;">
       <div class="form-row align-items-center" style="position: absolute;bottom: 45px;right:30px">
         <div class="col-auto">
-          <input type="text" class="form-control mb-2" id="qtdPassaros" placeholder="Qtd. pássaros" size="15" value="150">
+          <label class="mr-sm-2" for="qtdPassaros">Qtd. pássaros</label>
+          <input type="text" class="form-control mb-2" id="qtdPassaros" size="8" value="150">
         </div>
         <div class="col-auto">
-          <input type="text" class="form-control mb-2" id="velocidadeMaxima" placeholder="Veloc. máxima" size="15" value="2">
+            <label class="mr-sm-2" for="velocidadeMaxima">Veloc. máxima</label>
+          <input type="text" class="form-control mb-2" id="velocidadeMaxima" placeholder="Veloc. máxima" size="8" value="2">
         </div>
         <div class="col-auto">
-          <input type="text" class="form-control mb-2" id="raioCoesao" placeholder="Raio coesão" size="15" value="50">
+            <label class="mr-sm-2" for="raioCoesao">Raio coesão</label>
+          <input type="text" class="form-control mb-2" id="raioCoesao" placeholder="Raio coesão" size="8" value="50">
         </div>
         <div class="col-auto">
-          <input type="text" class="form-control mb-2" id="raioAlinhamento" placeholder="Raio alinhamento" size="15" value="50">
+            <label class="mr-sm-2" for="raioAlinhamento">Raio alinhamento</label>
+          <input type="text" class="form-control mb-2" id="raioAlinhamento" placeholder="Raio alinhamento" size="8" value="50">
         </div>
         <div class="col-auto">
-          <input type="text" class="form-control mb-2" id="raioSeparacao" placeholder="Raio separação" size="15" value="25">
+            <label class="mr-sm-2" for="raioSeparacao">Raio separação</label>
+          <input type="text" class="form-control mb-2" id="raioSeparacao" placeholder="Raio separação" size="8" value="25">
         </div>
         <div class="col-auto">
           <button type="submit" class="btn btn-primary mb-2">Atualizar</button>
@@ -34,250 +39,250 @@
     <div id="boids">
     </div>
 
-    <script src="p5.min.js" type="text/javascript"></script>
-    <script type="text/javascript">
-      
-      class Passaro {
+  <script src="p5.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    
+    class Passaro {
 
-        // Inicializa os parâmetros
-        constructor(x, y) {
-          this.x = x;
-          this.y = y;
-          this.aceleracao = createVector(0, 0);
-          this.velocidade = createVector(random(-1, 1), random(-1, 1));
-          this.posicao = createVector(x, y);
+      // Inicializa os parâmetros
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.aceleracao = createVector(0, 0);
+        this.velocidade = createVector(random(-1, 1), random(-1, 1));
+        this.posicao = createVector(x, y);
+      }
+
+      // Desloca o pássaro conforme análise de separação, alinhamento e coesão
+      movimentar(passaros) {
+        this.analisarVizinhanca(passaros);
+        this.atualizarPosicao();
+        this.verificarLimites();
+        this.renderizar();
+      }
+
+      // Verifica a influência dos pássaros vizinhos e adiciona na aceleração
+      analisarVizinhanca(passaros) {
+        this.aceleracao.add(this.separacao(passaros));
+        this.aceleracao.add(this.alinhamento(passaros));
+        this.aceleracao.add(this.coesao(passaros));
+      }
+
+      // Atualiza a posição do pássaro
+      atualizarPosicao() {
+        this.velocidade.add(this.aceleracao);
+        this.velocidade.limit(this.velocidadeMaxima);
+        this.posicao.add(this.velocidade);
+        this.aceleracao.mult(0);
+      }
+
+      // Calcula e aplica uma força em direção ao pássaro verificado
+      aplicarForcaPassaro(passaro) {
+        let desired = p5.Vector.sub(passaro, this.posicao);
+        desired.normalize();
+        desired.mult(this.velocidadeMaxima);
+        let direcao = p5.Vector.sub(desired, this.velocidade);
+        direcao.limit(this.forcaMaxima);
+        return direcao;
+      }
+
+      // Renderiza os pássaros no canvas
+      renderizar() {
+        let theta = this.velocidade.heading() + radians(90);
+        fill(200, 100);
+        stroke(255);
+        push();
+        translate(this.posicao.x, this.posicao.y);
+        rotate(theta);
+        beginShape();
+        image(passarosImg[Math.floor(random(0,7.99))], 0, this.height / 2, 15, 15);
+        endShape(CLOSE);
+        pop();
+        iteracoes++;
+      }
+
+      // Verifica se a posição do pássaro ficou fora do canvas
+      verificarLimites = function () {
+        if (this.posicao.x < 0) this.posicao.x = width;
+        if (this.posicao.y < 0) this.posicao.y = height;
+        if (this.posicao.x > width) this.posicao.x = 0;
+        if (this.posicao.y > height) this.posicao.y = 0;
+      }
+
+      // Verifica os pássaros ao reder e se afasta
+      // Obtém um vetor que corresponde a média da soma das distâncias entre o pássaro em consideração 
+      // e os demais em seu raio de separação (25 pixels), levando em conta que uma distância maior 
+      // representa uma necessidade menor de separação
+      separacao(passaros) {
+        let direcao = createVector(0, 0);
+        let count = 0;
+        passaros.forEach(passaro => {
+          let distancia = p5.Vector.dist(this.posicao, passaro.posicao);
+          if (passaro != this && distancia < this.raioSeparacao) {
+            let diff = p5.Vector.sub(this.posicao, passaro.posicao);
+            diff.normalize();
+            diff.div(distancia);
+            direcao.add(diff);
+            count++;
+          }
+        });
+        // Calcula a média
+        if (count > 0) {
+          direcao.div(count);
         }
 
-        // Desloca o pássaro conforme análise de separação, alinhamento e coesão
-        movimentar(passaros) {
-          this.analisarVizinhanca(passaros);
-          this.atualizarPosicao();
-          this.verificarLimites();
-          this.renderizar();
-        }
-
-        // Verifica a influência dos pássaros vizinhos e adiciona na aceleração
-        analisarVizinhanca(passaros) {
-          this.aceleracao.add(this.separacao(passaros));
-          this.aceleracao.add(this.alinhamento(passaros));
-          this.aceleracao.add(this.coesao(passaros));
-        }
-
-        // Atualiza a posição do pássaro
-        atualizarPosicao() {
-          this.velocidade.add(this.aceleracao);
-          this.velocidade.limit(this.velocidadeMaxima);
-          this.posicao.add(this.velocidade);
-          this.aceleracao.mult(0);
-        }
-
-        // Calcula e aplica uma força em direção ao pássaro verificado
-        aplicarForcaPassaro(passaro) {
-          let desired = p5.Vector.sub(passaro, this.posicao);
-          desired.normalize();
-          desired.mult(this.velocidadeMaxima);
-          let direcao = p5.Vector.sub(desired, this.velocidade);
+        if (direcao.mag() > 0) {
+          // Reynolds: Steering = Desired - Velocity
+          direcao.normalize();
+          direcao.mult(this.velocidadeMaxima);
+          direcao.sub(this.velocidade);
           direcao.limit(this.forcaMaxima);
-          return direcao;
         }
+        return direcao;
+      }
 
-        // Renderiza os pássaros no canvas
-        renderizar() {
-          let theta = this.velocidade.heading() + radians(90);
-          fill(200, 100);
-          stroke(255);
-          push();
-          translate(this.posicao.x, this.posicao.y);
-          rotate(theta);
-          beginShape();
-          image(passarosImg[Math.floor(random(0,7.99))], 0, this.height / 2, 15, 15);
-          endShape(CLOSE);
-          pop();
-          iteracoes++;
-        }
-
-        // Verifica se a posição do pássaro ficou fora do canvas
-        verificarLimites = function () {
-          if (this.posicao.x < 0) this.posicao.x = width;
-          if (this.posicao.y < 0) this.posicao.y = height;
-          if (this.posicao.x > width) this.posicao.x = 0;
-          if (this.posicao.y > height) this.posicao.y = 0;
-        }
-
-        // Verifica os pássaros ao reder e se afasta
-        // Obtém um vetor que corresponde a média da soma das distâncias entre o pássaro em consideração 
-        // e os demais em seu raio de separação (25 pixels), levando em conta que uma distância maior 
-        // representa uma necessidade menor de separação
-        separacao(passaros) {
-          let direcao = createVector(0, 0);
-          let count = 0;
-          passaros.forEach(passaro => {
-            let distancia = p5.Vector.dist(this.posicao, passaro.posicao);
-            if (passaro != this && distancia < this.raioSeparacao) {
-              let diff = p5.Vector.sub(this.posicao, passaro.posicao);
-              diff.normalize();
-              diff.div(distancia);
-              direcao.add(diff);
-              count++;
-            }
-          });
-          // Calcula a média
-          if (count > 0) {
-            direcao.div(count);
+      // Calcular a velocidade média de cada pássaro
+      // Média das direções de deslocamento daqueles pássaros contidos no raio maior do pássaro em consideração
+      alinhamento(passaros) {
+        let sum = createVector(0, 0);
+        let count = 0;
+        passaros.forEach(passaro => {
+          let distancia = p5.Vector.dist(this.posicao, passaro.posicao);
+          if (passaro != this && distancia < this.raioAlinhamento) {
+            sum.add(passaro.velocidade);
+            count++;
           }
-
-          if (direcao.mag() > 0) {
-            // Reynolds: Steering = Desired - Velocity
-            direcao.normalize();
-            direcao.mult(this.velocidadeMaxima);
-            direcao.sub(this.velocidade);
-            direcao.limit(this.forcaMaxima);
-          }
-          return direcao;
-        }
-
-        // Calcular a velocidade média de cada pássaro
-        // Média das direções de deslocamento daqueles pássaros contidos no raio maior do pássaro em consideração
-        alinhamento(passaros) {
-          let sum = createVector(0, 0);
-          let count = 0;
-          passaros.forEach(passaro => {
-            let distancia = p5.Vector.dist(this.posicao, passaro.posicao);
-            if (passaro != this && distancia < this.raioAlinhamento) {
-              sum.add(passaro.velocidade);
-              count++;
-            }
-          });
-          if (count > 0) {
-            sum.div(count);
-            sum.normalize();
-            sum.mult(this.velocidadeMaxima);
-            let steer = p5.Vector.sub(sum, this.velocidade);
-            steer.limit(this.forcaMaxima);
-            return steer;
-          } else {
-            return createVector(0, 0);
-          }
-        }
-
-        // Para a localização média (ou seja, centro) de todos os pássaros próximos, calcule o vetor 
-        // de direção em direção a esse local
-        // Média das posições atuais dos pássaros existentes no raio maior, efetivamente indicando uma 
-        // posição de centro de massa para onde um pássaro específico deverá ser deslocado
-        coesao(passaros) {
-          let sum = createVector(0, 0);
-          let count = 0;
-          passaros.forEach(passaro => {
-            let distancia = p5.Vector.dist(this.posicao, passaro.posicao);
-            if (passaro != this && distancia < this.raioCoesao) {
-              sum.add(passaro.posicao);
-              count++;
-            }
-          });
-          if (count > 0) {
-            sum.div(count);
-            return this.aplicarForcaPassaro(sum);
-          } else {
-            return createVector(0, 0);
-          }
+        });
+        if (count > 0) {
+          sum.div(count);
+          sum.normalize();
+          sum.mult(this.velocidadeMaxima);
+          let steer = p5.Vector.sub(sum, this.velocidade);
+          steer.limit(this.forcaMaxima);
+          return steer;
+        } else {
+          return createVector(0, 0);
         }
       }
 
-      class Bando {
-
-        passaros = [];
-
-        movimentar() {
-          this.passaros.forEach(passaro => {
-            passaro.movimentar(this.passaros);
-          });
+      // Para a localização média (ou seja, centro) de todos os pássaros próximos, calcule o vetor 
+      // de direção em direção a esse local
+      // Média das posições atuais dos pássaros existentes no raio maior, efetivamente indicando uma 
+      // posição de centro de massa para onde um pássaro específico deverá ser deslocado
+      coesao(passaros) {
+        let sum = createVector(0, 0);
+        let count = 0;
+        passaros.forEach(passaro => {
+          let distancia = p5.Vector.dist(this.posicao, passaro.posicao);
+          if (passaro != this && distancia < this.raioCoesao) {
+            sum.add(passaro.posicao);
+            count++;
+          }
+        });
+        if (count > 0) {
+          sum.div(count);
+          return this.aplicarForcaPassaro(sum);
+        } else {
+          return createVector(0, 0);
         }
-
-        adicionarPassaro(b) {
-          this.passaros.push(b);
-        }
-
       }
+    }
+
+    class Bando {
+
+      passaros = [];
+
+      movimentar() {
+        this.passaros.forEach(passaro => {
+          passaro.movimentar(this.passaros);
+        });
+      }
+
+      adicionarPassaro(b) {
+        this.passaros.push(b);
+      }
+
+    }
+    
+    let width = document.documentElement.clientWidth;
+    let heightCanvas = document.documentElement.clientHeight-50;
+    let height = heightCanvas*2/3.1;
+    
+    const passarosImg = [];
+    let bando;
+
+    let iteracoes;
+    let inicio;
+
+    function setup() {
+      [1,2,3,4,5,6,7,8].forEach(b => passarosImg.push(loadImage('img/' + b + '.png')));
+      let canvas = createCanvas(width, heightCanvas);
+      canvas.parent("boids"); // Adiciona a imgagem no DIV
+      init();
+    }
+
+    function init() {
+      iteracoes = 0;
+      inicio = (new Date()).getTime();
+      let qtdPassaros = parseInt(document.getElementById('qtdPassaros').value);
+      bando = new Bando();
+      for (let i = 0; i < qtdPassaros; i++) { // Cria 150 elementos no centro da imagem
+        let passaro = new Passaro(Math.random() * width, 0);
+        passaro.velocidadeMaxima = parseInt(document.getElementById('velocidadeMaxima').value);
+        passaro.forcaMaxima = 0.03;
+        passaro.raioSeparacao = parseInt(document.getElementById('raioSeparacao').value);
+        passaro.raioAlinhamento = parseInt(document.getElementById('raioAlinhamento').value);
+        passaro.raioCoesao = parseInt(document.getElementById('raioCoesao').value);
+        bando.adicionarPassaro(passaro);
+      }
+    }
+
+    function draw() {
+
+      let canvas = document.querySelector('#boids canvas');
+      let ctx = canvas.getContext('2d');
+
+      // Cria gradientes
+      let ceu = ctx.createLinearGradient(0, heightCanvas-height, 0, heightCanvas);
+      ceu.addColorStop(0, '#00ABEB');
+      ceu.addColorStop(0.5, '#fff');
+      ceu.addColorStop(0.5, '#26C000');
+      ceu.addColorStop(1, '#fff');
+
+      let gramado = ctx.createLinearGradient(0, 50, 0, 95);
+      gramado.addColorStop(0.5, '#000');
+      gramado.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      // Atribui gradientes para preencher e traçar estilos
+      ctx.fillStyle = ceu;
+      ctx.strokeStyle = gramado;
       
-      let width = document.documentElement.clientWidth;
-      let heightCanvas = document.documentElement.clientHeight-50;
-      let height = heightCanvas*2/3.1;
+      // Renderiza os elementos
+      ctx.fillRect(0, 0, width, heightCanvas);
+
+      fill(0);
+      ctx.font = '16pt "Neucha"';
+      ctx.fillText('Tempo: ' + Math.floor((((new Date()).getTime()-inicio)/1000)) + 's', 20, heightCanvas-40);
+      ctx.fillText('Iterações: ' + Math.floor((iteracoes/1000)) + 'k', 20, heightCanvas-10);
       
-      const passarosImg = [];
-      let bando;
+      bando.movimentar();
 
-      let iteracoes;
-      let inicio;
+    }
 
-      function setup() {
-        [1,2,3,4,5,6,7,8].forEach(b => passarosImg.push(loadImage('img/' + b + '.png')));
-        let canvas = createCanvas(width, heightCanvas);
-        canvas.parent("boids"); // Adiciona a imgagem no DIV
-        init();
-      }
+    // Adiciona um pássaro no local do click
+    function mousePressed() {
+      bando.adicionarPassaro(new Passaro(mouseX, mouseY));
+    }
 
-      function init() {
-        iteracoes = 0;
-        inicio = (new Date()).getTime();
-        let qtdPassaros = parseInt(document.getElementById('qtdPassaros').value);
-        bando = new Bando();
-        for (let i = 0; i < qtdPassaros; i++) { // Cria 150 elementos no centro da imagem
-          let passaro = new Passaro(Math.random() * width, 0);
-          passaro.velocidadeMaxima = parseInt(document.getElementById('velocidadeMaxima').value);
-          passaro.forcaMaxima = 0.03;
-          passaro.raioSeparacao = parseInt(document.getElementById('raioSeparacao').value);
-          passaro.raioAlinhamento = parseInt(document.getElementById('raioAlinhamento').value);
-          passaro.raioCoesao = parseInt(document.getElementById('raioCoesao').value);
-          bando.adicionarPassaro(passaro);
-        }
-      }
+    // Ajusta o tamanho da imagem quando redimensionar a janela
+    function windowResized() {
+      width = document.documentElement.clientWidth;
+      heightCanvas = document.documentElement.clientHeight-50;
+      height = heightCanvas*2/3.1;
+      resizeCanvas(windowWidth, windowHeight);
+    }
 
-      function draw() {
-
-        let canvas = document.querySelector('#boids canvas');
-        let ctx = canvas.getContext('2d');
-
-        // Cria gradientes
-        let ceu = ctx.createLinearGradient(0, heightCanvas-height, 0, heightCanvas);
-        ceu.addColorStop(0, '#00ABEB');
-        ceu.addColorStop(0.5, '#fff');
-        ceu.addColorStop(0.5, '#26C000');
-        ceu.addColorStop(1, '#fff');
-
-        let gramado = ctx.createLinearGradient(0, 50, 0, 95);
-        gramado.addColorStop(0.5, '#000');
-        gramado.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-        // Atribui gradientes para preencher e traçar estilos
-        ctx.fillStyle = ceu;
-        ctx.strokeStyle = gramado;
-        
-        // Renderiza os elementos
-        ctx.fillRect(0, 0, width, heightCanvas);
-
-        fill(0);
-        ctx.font = '16pt "Neucha"';
-        ctx.fillText('Tempo: ' + Math.floor((((new Date()).getTime()-inicio)/1000)) + 's', 20, heightCanvas-40);
-        ctx.fillText('Iterações: ' + Math.floor((iteracoes/1000)) + 'k', 20, heightCanvas-10);
-        
-        bando.movimentar();
-
-      }
-
-      // Adiciona um pássaro no local do click
-      function mousePressed() {
-        bando.adicionarPassaro(new Passaro(mouseX, mouseY));
-      }
-
-      // Ajusta o tamanho da imagem quando redimensionar a janela
-      function windowResized() {
-        width = document.documentElement.clientWidth;
-        heightCanvas = document.documentElement.clientHeight-50;
-        height = heightCanvas*2/3.1;
-        resizeCanvas(windowWidth, windowHeight);
-      }
-
-    </script>
+  </script>
 
   </body>
 </html>
