@@ -1,6 +1,3 @@
-
-
-
 <!doctype html>
 <html lang="pt-BR">
   <head>
@@ -32,6 +29,11 @@
           <input type="text" class="form-control mb-2" id="raioSeparacao" placeholder="Raio separação" size="8" value="25">
         </div>
         <div class="col-auto">
+          <div class="form-check mb-2">
+            <input class="form-check-input m-0" type="checkbox" id="efeitoGaiola"> Efeito gaiola
+          </div>
+        </div>
+        <div class="col-auto">
           <button type="submit" class="btn btn-primary mb-2">Atualizar</button>
         </div>
       </div>
@@ -54,18 +56,21 @@
       }
 
       // Desloca o pássaro conforme análise de separação, alinhamento e coesão
-      movimentar(passaros) {
-        this.analisarVizinhanca(passaros);
+      movimentar(passaros, barreiras) {
+        this.analisarVizinhanca(passaros, barreiras);
         this.atualizarPosicao();
-        this.verificarLimites();
+        this.verificarLimites(barreiras);
         this.renderizar();
       }
 
       // Verifica a influência dos pássaros vizinhos e adiciona na aceleração
-      analisarVizinhanca(passaros) {
+      analisarVizinhanca(passaros, barreiras) {
         this.aceleracao.add(this.separacao(passaros));
         this.aceleracao.add(this.alinhamento(passaros));
         this.aceleracao.add(this.coesao(passaros));
+        if (this.efeitoGaiola) {
+          this.aceleracao.add(this.limitesGaiola());
+        }
       }
 
       // Atualiza a posição do pássaro
@@ -89,8 +94,6 @@
       // Renderiza os pássaros no canvas
       renderizar() {
         let theta = this.velocidade.heading() + radians(90);
-        fill(200, 100);
-        stroke(255);
         push();
         translate(this.posicao.x, this.posicao.y);
         rotate(theta);
@@ -102,11 +105,52 @@
       }
 
       // Verifica se a posição do pássaro ficou fora do canvas
-      verificarLimites = function () {
-        if (this.posicao.x < 0) this.posicao.x = width;
-        if (this.posicao.y < 0) this.posicao.y = height;
-        if (this.posicao.x > width) this.posicao.x = 0;
-        if (this.posicao.y > height) this.posicao.y = 0;
+      verificarLimites(barreiras) {
+        for (let i=0;i<barreiras.length;i++) {
+          let b = barreiras[i];
+          if (this.posicao.x+10 >= b.x && this.posicao.x-10 <= b.x+10 &&
+              this.posicao.y+10 >= b.y) {
+            this.posicao.x = this.velocidade.x>0?this.posicao.x-this.velocidadeMaxima*3:this.posicao.x+this.velocidadeMaxima*3;
+            this.posicao.y -= this.velocidadeMaxima*2;
+            this.velocidade.x *= -1;
+            this.velocidade.y *= -1;
+            if (this.posicao.x+10 >= b.x && this.posicao.x-10 <= b.x+10 &&
+              this.posicao.y+10 >= b.y) {
+                this.posicao.x += 30;
+                this.posicao.y += 30;
+            }
+            break;
+          }
+        }
+        if (this.efeitoGaiola) {
+          if (this.posicao.x < 0) this.posicao.x = 0;
+          if (this.posicao.y < 0) this.posicao.y = 0;
+          if (this.posicao.x > width) this.posicao.x = width;
+          if (this.posicao.y > height) this.posicao.y = height;
+        } else {
+          if (this.posicao.x < 0) this.posicao.x = width;
+          if (this.posicao.y < 0) this.posicao.y = height;
+          if (this.posicao.x > width) this.posicao.x = 0;
+          if (this.posicao.y > height) this.posicao.y = 0;
+        }
+      }
+
+      // Limita o movimentos dos pássaros ao "céu"
+      limitesGaiola() {
+        let direcao = createVector(0, 0);
+        if ((this.posicao.x < width*0.15 && this.velocidade.x < 0) || (this.posicao.x > width*0.85 && this.velocidade.x > 0)) {
+          direcao.x = this.velocidade.x*-1;
+        } else if ((this.posicao.y < height*0.3 && this.velocidade.y < 0) || (this.posicao.y > height*0.7 && this.velocidade.y > 0)) {
+          direcao.y = this.velocidade.y*-1;
+        }
+
+        if (direcao.mag() > 0) {
+          direcao.normalize();
+          direcao.mult(this.velocidadeMaxima);
+          direcao.sub(this.velocidade);
+          direcao.limit(this.forcaMaxima);
+        }
+        return direcao;
       }
 
       // Verifica os pássaros ao reder e se afasta
@@ -192,9 +236,13 @@
 
       passaros = [];
 
+      constructor(barreiras) {
+        this.barreiras = barreiras;
+      }
+
       movimentar() {
         this.passaros.forEach(passaro => {
-          passaro.movimentar(this.passaros);
+          passaro.movimentar(this.passaros, this.barreiras);
         });
       }
 
@@ -210,6 +258,7 @@
     
     const passarosImg = [];
     let bando;
+    let barreiras;
 
     let iteracoes;
     let inicio;
@@ -225,14 +274,16 @@
       iteracoes = 0;
       inicio = (new Date()).getTime();
       let qtdPassaros = parseInt(document.getElementById('qtdPassaros').value);
-      bando = new Bando();
+      barreiras = [];
+      bando = new Bando(barreiras);
       for (let i = 0; i < qtdPassaros; i++) { // Cria 150 elementos no centro da imagem
         let passaro = new Passaro(Math.random() * width, 0);
         passaro.velocidadeMaxima = parseInt(document.getElementById('velocidadeMaxima').value);
-        passaro.forcaMaxima = 0.03;
+        passaro.forcaMaxima = 0.025;
         passaro.raioSeparacao = parseInt(document.getElementById('raioSeparacao').value);
         passaro.raioAlinhamento = parseInt(document.getElementById('raioAlinhamento').value);
         passaro.raioCoesao = parseInt(document.getElementById('raioCoesao').value);
+        passaro.efeitoGaiola = document.getElementById('efeitoGaiola').checked;
         bando.adicionarPassaro(passaro);
       }
     }
@@ -260,18 +311,43 @@
       // Renderiza os elementos
       ctx.fillRect(0, 0, width, heightCanvas);
 
-      fill(0);
-      ctx.font = '16pt "Neucha"';
-      ctx.fillText('Tempo: ' + Math.floor((((new Date()).getTime()-inicio)/1000)) + 's', 20, heightCanvas-40);
-      ctx.fillText('Iterações: ' + Math.floor((iteracoes/1000)) + 'k', 20, heightCanvas-10);
+      if (width > 890) {
+        fill(0);
+        ctx.font = '16pt "Neucha"';
+        ctx.fillText('Tempo: ' + Math.floor((((new Date()).getTime()-inicio)/1000)) + 's', 20, heightCanvas-40);
+        ctx.fillText('Iterações: ' + Math.floor((iteracoes/1000)) + 'k', 20, heightCanvas-10);
+      }
       
+      barreiras.forEach(b => {
+        push();
+        fill(92,64,51);
+        translate(b.x, b.y);
+        rect(0, 0, 10, (height*1.05)-b.y);
+        pop();
+      });
       bando.movimentar();
 
     }
 
-    // Adiciona um pássaro no local do click
+    class Barreira {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+      }
+    }
+
+    // Adiciona uma barreira no local do click
     function mousePressed() {
-      bando.adicionarPassaro(new Passaro(mouseX, mouseY));
+      let selecionada = barreiras.find(b => (mouseX >= b.x && mouseX <= b.x+10 && mouseY >= b.y));
+      if (selecionada) {
+        barreiras.splice(barreiras.indexOf(selecionada), 1);
+      } else {
+        if (mouseY < height) {
+          barreiras.push(new Barreira(mouseX, mouseY));
+          fill(0);
+          rect(0, 0, 20, 30);
+        }
+      }
     }
 
     // Ajusta o tamanho da imagem quando redimensionar a janela
