@@ -1,15 +1,12 @@
 class Agente {
 
-    renderizar(destacar) {
+    renderizar() {        
         push();
+        strokeWeight(1);
+        stroke(50,50,100);
         fill(this.cor);
-        if (destacar) {
-            translate(this.x, this.y);
-            circle(0, 0, 12);
-        } else {
-            translate(this.x, this.y);
-            circle(0, 0, 8);
-        }
+        translate(this.x, this.y);
+        circle(0, 0, 8);
         pop();
     }
 }
@@ -25,7 +22,6 @@ class Segregacao {
 
         this.btn = document.querySelector('#btn');
         this.paramOrder = document.querySelector("#param-order");
-        this.paramOrderHistory = document.querySelector("#param-order-history");
         this.log = document.querySelector("#log");
         this.numberAgents = document.querySelector('#numeroAgentes').value; // number of agents
         this.raioVizinhanca = document.querySelector('#raioVizinhanca').value; // neighborhood radius
@@ -39,10 +35,8 @@ class Segregacao {
         this.agentes = [];
         this.proximoAgente = undefined;
         this.paramOrder.innerHTML = '';
-        this.paramOrderHistory.innerHTML = '';
         this.log.innerHTML = '';
 
-        this.seriesHistory = [0.1,0.3,0.5,0.7,0.9].map(value => { return { name: value, data: []}; });
         this.series = [ { data: [] }];
 
         ['numeroAgentes','raioVizinhanca','limiteMover','tiposAgentes']
@@ -73,12 +67,6 @@ class Segregacao {
 
         let agente = this.proximoAgente?this.proximoAgente:this.agentes[Math.floor((Math.random() * this.numberAgents))];
         let neighbors;
-           
-        push();
-        translate(agente.x, agente.y);
-        fill(204, 101, 192, 127);
-        circle(0, 0, this.raioVizinhanca*2);
-        pop();
 
         neighbors = this.calcNeighbors(agente);
 
@@ -86,10 +74,17 @@ class Segregacao {
         log += this.iterator + ' iterações<br/>'
         neighbors.forEach(agente => log += '<font color=' + this.agentColor[agente.type] + '>o</font> ' + agente.id + '<br/>');
         document.querySelector('#log').innerHTML = log;
-        this.calcShcellingHistory();
+        
+        push();
+        translate(agente.x, agente.y);
+        fill(255, 255, 0, 220);
+        circle(0, 0, this.raioVizinhanca*2);;
+        fill(agente.cor);
+        circle(0, 0, 12);
+        pop();
 
         this.agentes.forEach(ag => {
-            ag.renderizar(ag==agente);
+            ag.renderizar();
         });
 
         if (this.iterator >= this.iterators && this.iterators != 0) {
@@ -116,14 +111,6 @@ class Segregacao {
     }
 
     showParamOrder() {
-        var paramOrderHistory = Highcharts.chart('param-order-history', {
-            title: { text: 'Histórico de parâmetros de ordem' },
-            subtitle: { text: 'por threshold' },
-            yAxis: { title: { text: 'Nível de Segregação' } },
-            legend: { layout: 'vertical', align: 'right', verticalAlign: 'middle' },
-            plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 1 } },
-            series: [0.1,0.3,0.5,0.7,0.9].map(value => { return { name: value, data: []}; })
-        });
         var paramOrder = Highcharts.chart('param-order', {
             title: { text: 'Parâmetros de ordem' },
             subtitle: { text: 'por threshold' },
@@ -133,30 +120,8 @@ class Segregacao {
             plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 1 } },
             series: [ { name: 'Threshold', data: []} ]
         });
-        paramOrderHistory.update({
-            series: this.seriesHistory
-        });
         paramOrder.update({
             series: this.series
-        });
-    }
-
-    calcShcellingHistory() {
-        [0.1,0.3,0.5,0.7,0.9]
-            .forEach((threshold, nbIndex) => {
-            let paramOrderAgente = [];
-            this.agentes.forEach((agente, index) => {
-                let neighbors = this.calcNeighbors(agente);
-                neighbors.push(agente);
-                if (neighbors.length) {
-                    var q = neighbors.filter(nb => nb.type == agente.type).length / neighbors.length;
-                    paramOrderAgente[index] = q < threshold?0:1;
-                } else {
-                    paramOrderAgente[index] = 1;
-                }
-            });
-            let total = paramOrderAgente.reduce((total, num) => total + num);
-            this.seriesHistory[nbIndex].data.push(total / this.numberAgents);
         });
     }
 
@@ -202,7 +167,8 @@ function setup() {
 
     document.getElementById('log').style.height = (heightCanvas - height + 10) + 'px';
     
-    
+    frameRate(60);
+
 }
 
 function draw() {
@@ -212,9 +178,9 @@ function draw() {
 
     // Cria gradientes
     let ceu = ctx.createLinearGradient(0, heightCanvas - height, 0, heightCanvas);
-    ceu.addColorStop(0, '#00ABEB');
+    ceu.addColorStop(0, '#ccc');
     ceu.addColorStop(0.5, '#fff');
-    ceu.addColorStop(0.5, '#26C000');
+    ceu.addColorStop(0.5, '#999');
     ceu.addColorStop(1, '#fff');
 
     let gramado = ctx.createLinearGradient(0, 50, 0, 95);
@@ -227,8 +193,9 @@ function draw() {
 
     // Renderiza os elementos
     ctx.fillRect(0, 0, width, heightCanvas);
-    segregacao.run();
     
+    segregacao.run();
+
 }
 
 function processar() {
@@ -240,7 +207,6 @@ function processar() {
         segregacao.estado = 2;
         segregacao.btn.innerHTML = 'Pausar';
         document.querySelector("#param-order").innerHTML = '';
-        document.querySelector("#param-order-history").innerHTML = '';
     } else if (segregacao.estado == 2) {
         segregacao.btn.innerHTML = 'Continuar';
         segregacao.estado = 3;
@@ -250,7 +216,8 @@ function processar() {
 }
 
 function parar() {
-   
+    ['numeroAgentes','raioVizinhanca','limiteMover','tiposAgentes']
+        .forEach(el => document.getElementById(el).disabled = false);
     segregacao.btn.innerHTML = 'Executar';
     segregacao.estado = 1;
     showOrder();
@@ -258,8 +225,19 @@ function parar() {
 }
 
 function showOrder() {
-    ['numeroAgentes','raioVizinhanca','limiteMover','tiposAgentes']
-                .forEach(el => document.getElementById(el).disabled = false);
     segregacao.calcShcelling();
     segregacao.showParamOrder();
+}
+
+// Ajusta o tamanho da imagem quando redimensionar a janela
+function windowResized() {
+    width = document.documentElement.clientWidth;
+    heightCanvas = document.documentElement.clientHeight - 100;
+    height = heightCanvas * 2 / 3.1;
+    resizeCanvas(windowWidth, windowHeight);
+}
+
+let velocidade = document.getElementById("velocidade");
+velocidade.oninput = (el) => {
+    frameRate(parseInt(el.target.value));
 }

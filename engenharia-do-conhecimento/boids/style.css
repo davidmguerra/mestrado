@@ -1,0 +1,20 @@
+input[text], button {
+    width: 120px !important;
+}
+
+#opt {
+    display: none;
+}
+
+@media screen and (max-width: 1120px) {
+    form div {
+        background-color: white;
+        padding: 8px;
+    }
+    #opt {
+        display: block;
+    }
+    .hidden-small {
+        display: none;
+    }
+}

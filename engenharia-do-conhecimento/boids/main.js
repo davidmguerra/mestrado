@@ -214,6 +214,7 @@ function setup() {
     [1, 2, 3, 4, 5, 6, 7, 8].forEach(b => passarosImg.push(loadImage('img/' + b + '.png')));
     let canvas = createCanvas(width, heightCanvas);
     canvas.parent("boids"); // Adiciona a imgagem no DIV
+    frameRate(60);
     init();
 }
 
@@ -307,4 +308,9 @@ function windowResized() {
     heightCanvas = document.documentElement.clientHeight - 50;
     height = heightCanvas * 2 / 3.1;
     resizeCanvas(windowWidth, windowHeight);
+}
+
+let velocidade = document.getElementById("velocidade");
+velocidade.oninput = (el) => {
+    frameRate(parseInt(el.target.value));
 }

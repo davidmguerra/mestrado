@@ -4,10 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="../../libs/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body style="margin: 0">
-    <form onsubmit="init();return false;">
+    <form onsubmit="init();return false;" class="hidden-small">
       <div class="form-row align-items-center" style="position: absolute;bottom: 45px;right:30px">
+        <div class="col-auto">
+            <label class="mr-sm-2" for="velocidade">Velocidade</label>
+            <input type="range" class="form-control mb-2" id="velocidade" min="1" max="60" step="1" value="60" style="-webkit-appearance: none;height: 25px;background: green;outline: none;">
+        </div>
         <div class="col-auto">
           <label class="mr-sm-2" for="qtdPassaros">Qtd. pássaros</label>
           <input type="text" class="form-control mb-2" id="qtdPassaros" size="8" value="150">
@@ -38,6 +43,9 @@
         </div>
       </div>
     </form>
+    <div style="position: absolute;bottom: 5px;right:45px">
+      <button id="opt" class="btn btn-primary mb-2" type="button" style="width:45px !important" onclick="document.querySelector('form').classList.toggle('hidden-small')"> = </button>
+    </div>
     <div id="boids">
     </div>
 
