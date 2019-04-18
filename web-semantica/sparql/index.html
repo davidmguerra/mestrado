@@ -1,51 +1,88 @@
-<!doctype html>
+<!doctype xhtml>
 <html lang="pt-BR">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="../../libs/bootstrap/bootstrap.min.css">
-    <style>
-      .card-body a {
-        text-decoration: none !important;
-      }
-      .card-body pre {
-        padding: 4px;
-      }
-    </style>
-  </head>
-  <body>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <script src="../../libs/utils.js"></script>
+  <script src="main.js"></script>
 
-    <div class="container">
-    
-      <div class="row">
-        <div class="accordion" id="accordionExample">
-          <div class="card">
-            <div class="card-header" id="headingTwo">
-              <h5 class="mb-0">
-                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                  Jogador de futebol, que nascem em um país com mais de 10 milhões de habitantes, que jogou como goleiro de um clube que tem um estádio com mais de 30.000 lugares e o país do clube é diferente do país de nascimento.
-                </button>
-              </h5>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../../libs/bootstrap/bootstrap.min.css">
+  <style>
+    .card-body a {
+      text-decoration: none !important;
+    }
+
+    .card-body pre {
+      padding: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="row">
+      <div class="col-12">
+        <h1 class="pt-3">SPARQL
+      </div>
+      
+      <div class="accordion w-100" id="consultas">
+        <div class="col-12">
+          <h2 class="pt-3 pb-3">Consultas insólitas</h2>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita1" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Pessoas que nasceram no mesmo dia que eu e que moram no Brasil
+              </button>
+            </h5>
+          </div>
+          <div id="insolita1" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT ?name ?birth ?death ?person 
+WHERE {      
+  ?person dbo:birthDate ?birth .      
+  ?person foaf:name ?name .      
+  ?person dbo:birthPlace :Brazil .      
+  OPTIONAL { ?person dbo:deathDate ?death } .      
+  FILTER (?birth = "1981-05-31"^^xsd:date) . 
+} 
+ORDER BY ?death ?name`);
+              </script></pre>
             </div>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
-              <div class="card-body">
-                <a href="#" onclick="openLink(this, event)">Abrir</a>
-<pre>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX dc: <http://purl.org/dc/elements/1.1/>
-PREFIX : <http://dbpedia.org/resource/>
-PREFIX dbpedia2: <http://dbpedia.org/property/>
-PREFIX dbpedia: <http://dbpedia.org/>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-SELECT distinct ?soccerplayer ?countryOfBirth ?team ?countryOfTeam ?stadiumcapacity
+          </div>
+        </div>
+        <div class="col-12">
+          <h2 class="pt-3 pb-3">Consultas de exemplo</h2>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#exemplo1" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Jogador de futebol, que nascem em um país com mais de 10 milhões de habitantes, que jogou como goleiro
+                de um clube que tem um estádio com mais de 30.000 lugares e o país do clube é diferente do país de
+                nascimento
+              </button>
+            </h5>
+          </div>
+          <div id="exemplo1" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT distinct ?soccerplayer ?countryOfBirth ?team ?countryOfTeam ?stadiumcapacity
 { 
   ?soccerplayer a dbo:SoccerPlayer ;
   dbo:position|dbp:position <http://dbpedia.org/resource/Goalkeeper_(association_football)> ;
@@ -58,119 +95,48 @@ SELECT distinct ?soccerplayer ?countryOfBirth ?team ?countryOfTeam ?stadiumcapac
   FILTER (?countryOfTeam != ?countryOfBirth)
   FILTER (?stadiumcapacity > 30000)
   FILTER (?population > 10000000)
-} order by ?soccerplayer  
-</pre>
-              </div>
+} order by ?soccerplayer `);
+              </script></pre>
             </div>
           </div>
-          <div class="card">
-            <div class="card-header" id="headingThree">
-              <h5 class="mb-0">
-                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                  Grupo de itens colapsável #3
-                </button>
-              </h5>
-            </div>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
-              <div class="card-body">
-<pre>
-    Jogador de futebol, que nascem em um país com mais de 10 milhões de habitantes, que jogou como goleiro de um clube que tem um estádio com mais de 30.000 lugares e o país do clube é diferente do país de nascimento.
-
-    PREFIX owl: <http://www.w3.org/2002/07/owl#>
-    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX dc: <http://purl.org/dc/elements/1.1/>
-    PREFIX : <http://dbpedia.org/resource/>
-    PREFIX dbpedia2: <http://dbpedia.org/property/>
-    PREFIX dbpedia: <http://dbpedia.org/>
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    
-    SELECT distinct ?soccerplayer ?countryOfBirth ?team ?countryOfTeam ?stadiumcapacity
-    { 
-      ?soccerplayer a dbo:SoccerPlayer ;
-      dbo:position|dbp:position <http://dbpedia.org/resource/Goalkeeper_(association_football)> ;
-      dbo:birthPlace/dbo:country* ?countryOfBirth ;
-      #dbo:number 13 ;
-      dbo:team ?team .
-      ?team dbo:capacity ?stadiumcapacity ; dbo:ground ?countryOfTeam . 
-      ?countryOfBirth a dbo:Country ; dbo:populationTotal ?population .
-      ?countryOfTeam a dbo:Country .
-      FILTER (?countryOfTeam != ?countryOfBirth)
-      FILTER (?stadiumcapacity > 30000)
-      FILTER (?population > 10000000)
-    } order by ?soccerplayer	
-    
-    Pessoas que nasceram em Berlim antes de 1900
-    
-    PREFIX owl: <http://www.w3.org/2002/07/owl#>
-    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX dc: <http://purl.org/dc/elements/1.1/>
-    PREFIX : <http://dbpedia.org/resource/>
-    PREFIX dbpedia2: <http://dbpedia.org/property/>
-    PREFIX dbpedia: <http://dbpedia.org/>
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    
-    SELECT ?name ?birth ?death ?person 
-    WHERE {      
-      ?person dbo:birthPlace :Berlin .      
-      ?person dbo:birthDate ?birth .      
-      ?person foaf:name ?name .      
-      ?person dbo:deathDate ?death .      
-      FILTER (?birth < "1900-01-01"^^xsd:date) . 
-    } 
-    ORDER BY ?name
-    
-    Pessoas que nasceram no mesmo dia que eu e que já morreram
-    
-    SELECT ?name ?birth ?death ?person 
-    WHERE {      
-      ?person dbo:birthDate ?birth .      
-      ?person foaf:name ?name .      
-      ?person dbo:deathDate ?death .      
-      FILTER (?birth < "1981-05-31"^^xsd:date) . 
-    } 
-    ORDER BY ?name
-    
-    
-    
-    
-    
-    
-    PREFIX dbo: <http://dbpedia.org/ontology/>
-    PREFIX dbp: <http://dbpedia.org/property/>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    
-    SELECT  min(?country_name) as ?Country_name min(?capital_name) as ?Capital_name min(?population) as ?Population
-    WHERE {
-    ?country a dbo:Country.
-    ?country rdfs:label ?country_name.
-    ?country dbo:capital ?capital.
-    ?capital  rdfs:label ?capital_name.
-    ?country ?p ?population .
-    FILTER(?p = dbo:populationTotal || ?p = dbp:populationCensus). 
-    FILTER NOT EXISTS { ?country dbo:dissolutionYear ?year }
-    FILTER langMatches( lang(?country_name), "en"  ).
-    FILTER langMatches( lang(?capital_name), "en"  ).}
-    GROUP BY ?country_name
-</pre>
+        </div>
+        <div class="card">
+          <div class="card-header" id="headingThree">
+            <h5 class="mb-0">
+              <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#exemplo2">
+                Pessoas que nasceram em Berlim antes de 1900
+              </button>
+            </h5>
+          </div>
+          <div id="exemplo2" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
               </div>
+              <pre><script>
+                writeHTML(`SELECT ?name ?birth ?death ?person 
+WHERE {      
+  ?person dbo:birthPlace :Berlin .      
+  ?person dbo:birthDate ?birth .      
+  ?person foaf:name ?name .      
+  ?person dbo:deathDate ?death .      
+  FILTER (?birth < "1900-01-01"^^xsd:date) . 
+} 
+ORDER BY ?name`);
+              </script></pre>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="../../libs/jquery/jquery-3.3.1.slim.min.js"></script>
-    <script src="../../libs/bootstrap/popper.min.js"></script>
-    <script src="../../libs/bootstrap/bootstrap.min.js"></script>
-    
-    <script src="main.js"></script>
-  </body>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../../libs/jquery/jquery-3.3.1.slim.min.js"></script>
+  <script src="../../libs/bootstrap/popper.min.js"></script>
+  <script src="../../libs/bootstrap/bootstrap.min.js"></script>
+
+</body>
+
 </html>

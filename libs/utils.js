@@ -25,3 +25,11 @@ let evalContent = (content) => {
         alert('ERROR: ' + e)
     }
 }
+
+let escapeHTML = (html) => {
+    return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+}
+
+let writeHTML = (html) => {
+    return document.write(escapeHTML(html));
+}
