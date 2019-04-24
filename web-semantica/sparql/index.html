@@ -24,12 +24,10 @@
 <body>
 
   <div class="container">
-
     <div class="row">
       <div class="col-12">
         <h1 class="pt-3">SPARQL
-      </div>
-      
+      </div>      
       <div class="accordion w-100" id="consultas">
         <div class="col-12">
           <h2 class="pt-3 pb-3">Consultas insólitas</h2>
@@ -39,7 +37,7 @@
             <h5 class="mb-0">
               <button data-target="#insolita1" class="btn btn-link collapsed text-left" type="button"
                 data-toggle="collapse">
-                Pessoas que nasceram no mesmo dia que eu e que moram no Brasil
+                Existe alguma atriz cujo pai também é ator, músico e ganhador de pelo menos um prêmio Grammy?
               </button>
             </h5>
           </div>
@@ -49,15 +47,257 @@
                 <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
               </div>
               <pre><script>
-                writeHTML(`SELECT ?name ?birth ?death ?person 
-WHERE {      
-  ?person dbo:birthDate ?birth .      
-  ?person foaf:name ?name .      
-  ?person dbo:birthPlace :Brazil .      
-  OPTIONAL { ?person dbo:deathDate ?death } .      
-  FILTER (?birth = "1981-05-31"^^xsd:date) . 
-} 
-ORDER BY ?death ?name`);
+                writeHTML(`SELECT DISTINCT ?nome WHERE {
+  ?atriz <http://purl.org/linguistics/gold/hypernym> dbr:Actress .
+  ?atriz foaf:name ?nome .
+  ?atriz rdf:type <http://dbpedia.org/ontology/Person> .
+  ?atriz dbo:parent ?pai .
+  ?pai foaf:gender "male"@en .
+  ?pai a dbo:MusicalArtist .
+  ?pai dct:subject dbc:Grammy_Award_winners .
+  ?pai foaf:name ?nomePai .
+  ?pai <http://purl.org/linguistics/gold/hypernym> dbr:Actor .
+}`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita2" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Existe algum político que seja músico e ator?
+              </button>
+            </h5>
+          </div>
+          <div id="insolita2" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT ?politico 
+WHERE {
+  ?politico a <http://dbpedia.org/ontology/Politician> .
+  ?politico a dbo:MusicalArtist .
+  ?politico <http://purl.org/linguistics/gold/hypernym>/dbr:Actor|<http://purl.org/linguistics/gold/hypernym>/dbr:Actress ?ator .
+}`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita3" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Existe algum livro que o número de habitantes da cidade onde ele nasceu o autor dele seja menor que 5000?
+              </button>
+            </h5>
+          </div>
+          <div id="insolita3" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT ?livro ?paginas ?autor ?habitantes 
+WHERE {
+  ?livro a <http://dbpedia.org/ontology/Book> .
+  ?livro dbp:author ?autor .
+  ?autor dbo:birthPlace ?nascimento .
+  ?nascimento dbo:populationTotal ?habitantes
+  FILTER (?habitantes < 5000)
+}`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita4" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Existe algum filme que o valor gasto com a produção seja maior que a população do país de nascimento do diretor?
+              </button>
+            </h5>
+          </div>
+          <div id="insolita4" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT ?filme ?diretor ?paisNascimento ?populacao ?gasto 
+WHERE {
+  ?filme a <http://dbpedia.org/ontology/Film> .
+  ?filme dbo:director ?diretor .
+  ?filme dbo:budget ?gasto .
+  ?diretor dbo:birthPlace/dbo:country* ?paisNascimento .
+  ?paisNascimento dbo:populationTotal ?populacao
+  FILTER (?populacao < ?gasto)
+}`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita5" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Consulta que exibe todas as pessoas que possuem alguma relação com o Michael Jackson
+              </button>
+            </h5>
+          </div>
+          <div id="insolita5" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT DISTINCT ?relExterno ?relacionamento ?pessoa
+WHERE {
+  { ?pessoa a foaf:Person;
+	?relacionamento dbr:Michael_Jackson
+  }
+UNION
+  { ?pessoa a foaf:Person .
+	dbr:Michael_Jackson ?relExterno ?pessoa }
+  }`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita6" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Consultar as 50 primeiras ontologias disponíveis
+              </button>
+            </h5>
+          </div>
+          <div id="insolita6" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT DISTINCT ?concept
+WHERE {
+	?s rdf:type ?concept .
+} LIMIT 50`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita7" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Pessoas que nasceram no mesmo dia que eu e que moram no Brasil
+              </button>
+            </h5>
+          </div>
+          <div id="insolita7" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT ?name ?birth ?death ?person
+WHERE { 	 
+  ?person dbo:birthDate ?birth . 	 
+  ?person foaf:name ?name . 	 
+  ?person dbo:birthPlace :Brazil . 	 
+  OPTIONAL { ?person dbo:deathDate ?death } . 	 
+  FILTER (?birth = "1981-05-31"^^xsd:date) .
+}`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita8" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Algum arquiteto nasceu no mesmo dia que minha namorada?
+              </button>
+            </h5>
+          </div>
+          <div id="insolita8" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT ?arq WHERE {
+  ?arq a <http://dbpedia.org/ontology/Architect> .
+  ?arq dbo:birthDate ?nascimento .
+  FILTER (?nascimento = "1994-10-10"^^xsd:date) .
+}`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita9" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Consulta pra exibir os 10 músicos que morreram mais velhos
+              </button>
+            </h5>
+          </div>
+          <div id="insolita9" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT DISTINCT ?s xsd:date( str(?born) ) xsd:date( str(?died) )
+                 ( bif:datediff( 'year', xsd:date( str(?born) ), xsd:date( str(?died) ) ) )  AS ?age
+WHERE { 
+  ?s a dbo:MusicalArtist ;
+  dbo:deathDate ?died ;
+  dbo:birthDate ?born . 
+  FILTER(xsd:date(coalesce(xsd:date(?died), '1000-01-01')) >= "1800-01-01"^^xsd:date).
+  FILTER(xsd:date(coalesce(xsd:date(?born), '1000-01-01')) >= "1800-01-01"^^xsd:date).
+}
+ORDER BY DESC(?age)
+LIMIT 10`);
+              </script></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button data-target="#insolita10" class="btn btn-link collapsed text-left" type="button"
+                data-toggle="collapse">
+                Consulta para retornar os 10 países com maiores populações
+              </button>
+            </h5>
+          </div>
+          <div id="insolita10" class="collapse" data-parent="#consultas">
+            <div class="card-body">
+              <div class="text-right pr-2">
+                <a href="#" class="" onclick="openLink(this, event)">Abrir</a>
+              </div>
+              <pre><script>
+                writeHTML(`SELECT ?nome ?populacao
+WHERE {
+  ?pais rdf:type dbo:Country ;
+  rdfs:label ?nome;
+  dbo:populationTotal ?populacao .
+  FILTER (langMatches(lang(?nome), "EN")) 
+}
+ORDER BY DESC(?populacao)
+LIMIT 10`);
               </script></pre>
             </div>
           </div>
