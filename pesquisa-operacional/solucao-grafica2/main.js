@@ -18,7 +18,7 @@ function processar() {
         if (!restricoes[i]) {
             continue;
         }
-        let rest, x1, x2, operacao;
+        let rest, restX, x1, x2, operacao1, operacao2, resultado1, resultado2;
         
         rest = restricoes[i].replace(/ /g, '').match(/(.*)([\<\>]+[\=]+)(.*)/);
         x1 = rest[1].split(/[\+\-]/).find(el => el.indexOf('x1') != -1);
@@ -37,18 +37,10 @@ function processar() {
         }
         resultado = rest[3];
 
-        operacao = eval(0 + rest[2] + resultado);
-
         let data = [];
         if (x1 == undefined || x1 == '') {
-            
             data.push([eval(resultado + '/' + x2), 0]);
-            if (operacao) {
-                data.push([0, 0]);
-                data.push([0, eval(resultado + '/' + x2)]);
-            }
             data.push([eval(resultado + '/' + x2), eval(resultado + '/' + x2)]);
-            
         } else if (x2 == undefined || x2 == '') {
             data.push([0, eval(resultado + '/' + x1)]);
             data.push([eval(resultado + '/' + x1), eval(resultado + '/' + x1)]);
@@ -60,9 +52,7 @@ function processar() {
         maxX1 = data[0][0]>maxX1?data[0][0]:data[1][0]>maxX1?data[1][0]:maxX1;
         maxX2 = data[0][1]>maxX2?data[0][1]:data[1][1]>maxX2?data[1][1]:maxX2;
         
-        let threshold = eval(0 + operacao + resultado)?maxX2*-2:maxX2*2;
-
-        series[pos++] = { name: 'Restrição ' + pos, data: data, threshold: threshold, fillOpacity: 100/restricoes.length/100};
+        series[pos++] = { name: 'Restrição ' + pos, data: data};
 
    }
    series.forEach((serie, index) => {
@@ -73,7 +63,7 @@ function processar() {
             serie.data[1][1] = maxX2;
         }
     });
-   series.push({ name: 'E', data: [[0.5,0.5]]})
+   series.push({ name: 'E', data: [[1,1]]})
    
    var grafico = Highcharts.chart('grafico', {
         chart: { type: 'area' },
