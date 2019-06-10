@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../../libs/bootstrap/bootstrap.min.css">
+
+  </head>
+  <body>
+
+  <div class="container">
+  
+    <div class="row">
+      <div class="col-12 mb-4">
+        <h4 class="mb-3">Parâmetros</h4>
+        <form onsubmit="return processar()">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Matriz</label>
+              
+<textarea type="text" class="form-control" id="M" required rows="15">	FOR	SLU	TER	NAT	JPE	REC	MAC	ARA	SAL
+FOR	0	899	593	525	681	780	951	1108	1189
+SLU	899	0	435	1404	1560	1553	1628	1545	1579
+TER	593	433	0	1109	1162	1121	1196	1113	1146
+NAT	542	1435	1047	0	190	289	545	787	1093
+JPE	699	1592	1164	190	0	122	377	620	925
+REC	798	1552	1120	289	120	0	259	501	807
+MAC	975	582	1195	543	374	256	0	277	582
+ARA	1107	1544	1112	786	618	500	276	0	327
+SAL	1187	1575	1143	1091	923	805	581	324	0</textarea>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Quantidade de soluções aleatórias</label>
+              <input type="number" class="form-control" id="qtd" placeholder="qtd" value="10" min="0" required>
+              <hr class="mb-4">
+              <button id="btn" class="btn btn-primary btn-lg btn-block" type="submit">Executar</button>
+              <input type="number" class="form-control" id="qtdMatriz" placeholder="qtd" value="10" min="0" required>
+              <button id="btn" class="btn btn-primary btn-lg btn-block" type="button" onclick="gerarProblema()">Gerar matriz</button>
+              <div class="mt-3">
+                <b>Resultado</b>: <pre id="resultado"></pre>
+              </div>
+            </div>
+            
+          </div>
+        </form>
+        
+      </div>
+    </div>
+
+    <!-- HighCharts -->
+    <script src="../../libs/highcharts/highcharts.js"></script>
+    <script src="../../libs/highcharts/series-label.js"></script>
+    <script src="../../libs/highcharts/exporting.js"></script>
+    <script src="../../libs/highcharts/export-data.js"></script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../../libs/jquery/jquery-3.3.1.slim.min.js"></script>
+    <script src="../../libs/bootstrap/popper.min.js"></script>
+    <script src="../../libs/bootstrap/bootstrap.min.js"></script>
+
+    <script src="../../libs/utils.js"></script>
+    <script src="main.js"></script>
+    <script src="caminho-aleatorio.js"></script>
+    <script src="forca-bruta.js"></script>
+    <script src="mais-barato.js"></script>
+    <script src="vizinho-mais-proximo.js"></script>
+    <script src="tab.js"></script>
+  </body>
+</html>
