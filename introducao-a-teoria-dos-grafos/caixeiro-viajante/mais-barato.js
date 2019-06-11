@@ -18,8 +18,17 @@ let construirMaisBarato = (matriz) => {
             }
         }
 
-        //TODO Verificar em que posição colocar
-        caminho.push(vizinhoSelecionado);
+        let menorCusto = Number.MAX_VALUE;
+        let pos = -1;
+        for (let i=0; i < caminho.length-1; i++) {
+            let custo = matriz[caminho[i]][vizinhoSelecionado] + matriz[vizinhoSelecionado][caminho[i+1]] - matriz[caminho[i]][caminho[i+1]];
+            if (custo < menorCusto) {
+                menorCusto = custo;
+                pos = i + 1;
+            }
+        }
+
+        caminho.splice(pos, 0, vizinhoSelecionado);
 
         selecionados[vizinhoSelecionado] = true;
 

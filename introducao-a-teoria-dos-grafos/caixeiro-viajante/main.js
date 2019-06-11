@@ -6,7 +6,7 @@ let processar = () => {
 
     let elementos = document.querySelector('#M').value;
     let matriz = gerarMatriz(elementos);
-    let labels = elementos.substr(0, elementos.indexOf('\n')).split('	').slice(1);;
+    let labels = elementos.substr(0, elementos.indexOf('\n')).split(/\s{4,}|\t/).slice(1);;
 
     custo = Number.MAX_VALUE;
     inicio = Date.now();
@@ -33,7 +33,7 @@ let processar = () => {
     inicio = Date.now();
     solucao = construirMaisBarato(matriz);
     custo = calcularCusto(matriz, solucao);
-    imprimirCaminho('Mais barato (TODO)', solucao, labels, custo, (Date.now() - inicio));
+    imprimirCaminho('Solução vértice mais próximo e aresta mais barata', solucao, labels, custo, (Date.now() - inicio));
 
     return false;
 
@@ -66,7 +66,7 @@ let gerarMatriz = (elementos) => {
     var pos = -1;
     for (var i = 1; i < linhas.length; i++) {
         if (linhas[i].trim() == '') continue;
-        var colunas = linhas[i].split('	');
+        var colunas = linhas[i].split(/\s{4,}|\t/);
         matriz[++pos] = [];
         for (var j = 1; j < colunas.length; j++) {
             matriz[pos][j - 1] = parseInt(colunas[j]);
