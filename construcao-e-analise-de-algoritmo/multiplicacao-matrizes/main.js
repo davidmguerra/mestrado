@@ -1,7 +1,7 @@
 let processar = () => {
 
     let elementos = document.querySelector('#M').value;
-    let matrizes = elementos.split('\n').slice(1);
+    let matrizes = elementos.split('\n').slice(1).filter(val => val.trim() != '');
     document.querySelector('#resultado').innerHTML = 'Solução gulosa\n';
     matrizes.forEach(matriz => {
         let aux = matriz.split(/\s+/).map(val => parseInt(val));

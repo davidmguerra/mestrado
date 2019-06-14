@@ -1,58 +1,57 @@
-//Quantidade de instâncias
-//n (1 ≤ n ≤ 100) que indica o tamanho da cadeia de matrizes
-//A seguir, na mesma linha, há n + 1 inteiros que correspondem às dimensões das matrizes: p0 p1 … pn.
-
-//3
-//2 2 3 7 
-//3 2 3 7 2 
-//4 8 3 1 10 1
-
-//A2x3 B3x7
-//A2x3 B3x7 C7x2
-//A8x3 B3x1 C1x10 D10x1
-
-
-/***
- * n = (j - i)  => (1, p.length - 1)
- * Equação de recorrencia: T(n) = 2T(n/2) + n (?)
- * Divisão: sempre escolhendo um K e dividindo o problema em (i, k) e (k + 1, j)
- * Conquista: Somatório da divisão
- * Tudo antes da divisão => Teta(n)(?)
- *
- * Caso sempre o k = i for o menor valor, o seguinte codigo vai ser executado somente uma ver por cada chamada ao método:
- *     valor = x;
- *     auxK = k;
- *
- * @param matriz
- * @param i
- * @param j
- * @return
-*/
+/**
+ * 
+ * Algoritmo recursivo guloso para o problema de parentização da multiplicação de uma cadeia de matrizes (Seção 15.2 do 
+ * CLRS – Introduction to Algorithms, 3ª Edição).
+ * 
+ * Observações:
+ * 
+ * Primeira e última dimensão informa a quantidade de linhas da primeira matriz e a quantidade de colunas da última matriz.
+ *      Ou seja, matriz resultante será A p[0] x p[n-1]
+ * Equação de reocorrência: T(n) = 2T(n/2) + cn
+ *      cn lg(n) + cn (igual ao merge sort)
+ * 
+ * Ex.:
+ * 
+ * 3
+ * 2 2 3 7 
+ * 3 2 3 7 2 
+ * 4 8 3 1 10 1
+ * 
+ * A2x3 B3x7
+ * A2x3 B3x7 C7x2
+ * A8x3 B3x1 C1x10 D10x1
+ * 
+ * @param {*} dimensoes 
+ * @param {*} inicio 
+ * @param {*} fim 
+ * @return Um array com o custo na primeira posição e a parentização na segunda
+ */
 let guloso = (dimensoes, inicio, fim) => {
 
     if (inicio == fim) {
         return [0, 'A' + inicio];
     }
-    let valor = Number.MAX_VALUE;
-    let auxK = -1;
+    
+    let menorCusto = Number.MAX_VALUE;
+    let dimensaoMenorCusto = -1;
 
-    for (let k = inicio; k < fim; k++) {
-        let x = dimensoes[inicio - 1] * dimensoes[k] * dimensoes[fim];
-        if (x < valor) {
-            valor = x;
-            auxK = k;
+    for (let pos = inicio; pos < fim; pos++) {
+        let custoDimensao = dimensoes[inicio - 1] * dimensoes[pos] * dimensoes[fim];
+        if (custoDimensao < menorCusto) {
+            menorCusto = custoDimensao;
+            dimensaoMenorCusto = pos;
         }
     }
 
-    let str = "(";
-    let aux = guloso(dimensoes, inicio, auxK);
-    valor += aux[0];
-    str += aux[1]; 
+    let parentizacao = "(";
+    let esquerda = guloso(dimensoes, inicio, dimensaoMenorCusto);
+    let custo = menorCusto + esquerda[0];
+    parentizacao += esquerda[1]; 
 
-    aux = guloso(dimensoes, auxK + 1, fim);
-    valor += aux[0]; 
-    str += aux[1]; 
-    str += ')';
+    let direita = guloso(dimensoes, dimensaoMenorCusto + 1, fim);
+    custo += direita[0]; 
+    parentizacao += direita[1]; 
+    parentizacao += ')';
 
-    return [valor, str];
+    return [custo, parentizacao];
 }
