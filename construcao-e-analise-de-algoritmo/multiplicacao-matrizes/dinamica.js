@@ -49,47 +49,8 @@ let dinamica = (dimensoes) => {
             }
         }
     }
-
-    let parentizacao = '';
-    //parentizacao = printar(s, 1, dimensoes.length - 1);
-    let inicio = 1;
-    let fim = dimensoes.length - 1;
-    while (inicio != fim) {
-        parentizacao += '(';
-        fim = s[inicio][fim];
-    }
-    parentizacao += 'A' + inicio;
-
-    fim = dimensoes.length - 1;
-    inicio = s[inicio][fim] + 1;
-    while (inicio != fim) {
-        parentizacao += '(';
-        inicio = s[inicio][fim] + 1;
-    }
-    parentizacao += 'A' + inicio;
-    parentizacao += ')';
-
-
-
-
-/*
-
-    if (dimensoes.length == 2) {
-        parentizacao = 'A1';
-    } else {
-        for (var inicio = 1; inicio < dimensoes.length - 1; inicio++) {
-            parentizacao += '(';
-            while ( inicio != fim) {
-
-            }
-            for (let j = 0; j < s[inicio].length - 1;j++) {
-
-            }
-            parentizacao += ')';
-        }
-    }
-*/
-    return [m[1][dimensoes.length - 1], parentizacao];
+    
+    return [m[1][dimensoes.length - 1], printar(s, 1, dimensoes.length - 1)];
 }
 
 let printar = (s, inicio, fim) => {
