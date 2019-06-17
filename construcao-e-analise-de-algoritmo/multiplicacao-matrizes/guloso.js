@@ -9,6 +9,7 @@
  *      Ou seja, matriz resultante será A p[0] x p[n-1]
  * Equação de reocorrência: T(n) = 2T(n/2) + cn
  *      cn lg(n) + cn (igual ao merge sort)
+ *      É TETA(nlg(n)) para qualquer caso, pois sempre divide o problema em dois que a soma dá o total
  * 
  * Ex.:
  * 
@@ -21,36 +22,39 @@
  * A2x3 B3x7 C7x2
  * A8x3 B3x1 C1x10 D10x1
  * 
- * @param {*} dimensoes 
- * @param {*} inicio 
- * @param {*} fim 
- * @return Um array com o custo na primeira posição e a parentização na segunda
+ * @param {*} p 
+ * @param {*} i 
+ * @param {*} j 
+ * @return Um array com o custo na primeira kiição e a parentização na segunda
  */
-let guloso = (dimensoes, inicio, fim) => {
+let guloso = (p, i = 1, j = p.length-1) => {
 
-    if (inicio == fim) {
-        return [0, 'A' + inicio];
+    if (i == j) {
+        return [0, 'A' + i];
     }
     
-    let menorCusto = Number.MAX_VALUE;
-    let dimensaoMenorCusto = -1;
+    let mk = Number.MAX_VALUE;
+    let k;
 
-    for (let pos = inicio; pos < fim; pos++) {
-        let custoDimensao = dimensoes[inicio - 1] * dimensoes[pos] * dimensoes[fim];
-        if (custoDimensao < menorCusto) {
-            menorCusto = custoDimensao;
-            dimensaoMenorCusto = pos;
+    //m[i, j] = m[i, k] + m[k + 1, j] + Pi-1PkPj
+    for (let ki = i; ki < j; ki++) {
+        let m = p[i - 1] * p[ki] * p[j];
+        if (m < mk) {
+            mk = m;
+            k = ki;
         }
     }
 
+    //min {m[i, k] + m[k+1, j] + Pi-1*Pk*Pj} i<=k<j
+    let custo = mk;
     let parentizacao = "(";
-    let esquerda = guloso(dimensoes, inicio, dimensaoMenorCusto);
-    let custo = menorCusto + esquerda[0];
-    parentizacao += esquerda[1]; 
+    let mik = guloso(p, i, k);
+    custo += mik[0];
+    parentizacao += mik[1]; 
 
-    let direita = guloso(dimensoes, dimensaoMenorCusto + 1, fim);
-    custo += direita[0]; 
-    parentizacao += direita[1]; 
+    let mk1j = guloso(p, k + 1, j);
+    custo += mk1j[0]; 
+    parentizacao += mk1j[1]; 
     parentizacao += ')';
 
     return [custo, parentizacao];
